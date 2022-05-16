@@ -13,7 +13,7 @@ async function readTalker() {
   return []; 
 }
 
-routes.get('/', async (_req, res) => {
+routes.get('/talker', async (_req, res) => {
   const talkers = await readTalker();
   res.status(200).json(talkers);
 });
