@@ -1,5 +1,7 @@
 const fs = require('fs').promises;
 
+const crypto = require('crypto');
+
 const express = require('express');
 
 const middlewares = require('../middlewares');
@@ -17,6 +19,10 @@ async function readTalker() {
   return []; 
 }
 
+function generateToken() {
+  return crypto.randomBytes(8).toString('hex');
+}
+
 routes.get('/talker', async (_req, res) => {
   const talkers = await readTalker();
   res.status(200).json(talkers);
@@ -28,6 +34,12 @@ routes.get('/talker/:id', async (req, res) => {
   const person = talkers.filter((p) => p.id === Number(id));
   if (person.length > 0) return res.status(200).json(person[0]);
   throw new Error(JSON.stringify({ status: 404, message: 'Pessoa palestrante não encontrada' }));
+});
+
+routes.post('/login', (_req, res) => {
+  // const { email, password } = req.body;
+  const token = generateToken();
+  res.status(200).json({ token });
 });
 
 routes.use(middlewares.errorHandler);
