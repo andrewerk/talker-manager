@@ -36,7 +36,7 @@ routes.get('/talker/:id', async (req, res) => {
   throw new Error(JSON.stringify({ status: 404, message: 'Pessoa palestrante não encontrada' }));
 });
 
-routes.post('/login', (_req, res) => {
+routes.post('/login', middlewares.loginValidation, (_req, res) => {
   // const { email, password } = req.body;
   const token = generateToken();
   res.status(200).json({ token });
