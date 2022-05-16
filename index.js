@@ -1,6 +1,9 @@
 const express = require('express');
 
 const app = express();
+
+const middlewares = require('./middlewares');
+
 app.use(express.json());
 
 app.use('', require('./routes'));
@@ -12,6 +15,8 @@ const PORT = '3000';
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
+
+app.use(middlewares.errorHandler);
 
 app.listen(PORT, () => {
   console.log('Online');
