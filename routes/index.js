@@ -58,7 +58,7 @@ routes.post('/talker',
     const newTalkers = [...talkers, { name, age, id, talk: { watchedAt, rate } }];
     console.log(newTalkers);
     await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
-    res.status(201).end();
+    res.status(201).json({ name, age, id, talk: { watchedAt, rate } });
 });
 
 routes.use(middlewares.errorHandler);
