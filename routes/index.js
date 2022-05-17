@@ -50,8 +50,15 @@ routes.post('/talker',
   middlewares.ageValidation,
   middlewares.talkValidation,
   middlewares.rateAndWatchedValidation,
-  (req, _res) => {
-  console.log(req.header);
+  async (req, res) => {
+    const { name, age, talk } = req.body;
+    const { rate, watchedAt } = talk;
+    const talkers = await readTalker();
+    const id = talkers.length + 1;
+    const newTalkers = [...talkers, { name, age, id, talk: { watchedAt, rate } }];
+    console.log(newTalkers);
+    await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
+    res.status(201).end();
 });
 
 routes.use(middlewares.errorHandler);
