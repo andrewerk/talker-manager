@@ -56,12 +56,18 @@ routes.post('/login', middlewares.loginValidation, (_req, res) => {
 
 routes.use(middlewares.autho);
 
-routes.post('/talker',
-  middlewares.nameValidation,
-  middlewares.ageValidation,
-  middlewares.talkValidation,
-  middlewares.rateAndWatchedValidation,
-  async (req, res) => {
+routes.delete('/talker/:id', async (req, res) => {
+  const { id } = req.params;
+  const talkers = await readTalker();
+  const newTalkers = talkers.filter((p) => p.id !== Number(id));
+  await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
+  res.status(204).end();
+});
+
+const { nameValidation, ageValidation, talkValidation, rateAndWatchedValidation } = middlewares;
+routes.use(nameValidation, ageValidation, talkValidation, rateAndWatchedValidation);
+
+routes.post('/talker', async (req, res) => {
     const { name, age, talk } = req.body;
     const { rate, watchedAt } = talk;
     const talkers = await readTalker();
@@ -71,12 +77,7 @@ routes.post('/talker',
     res.status(201).json({ name, age, id, talk: { watchedAt, rate } });
 });
 
-routes.put('/talker/:id',
-  middlewares.nameValidation,
-  middlewares.ageValidation,
-  middlewares.talkValidation,
-  middlewares.rateAndWatchedValidation,
-  async (req, res) => {
+routes.put('/talker/:id', async (req, res) => {
     const { id } = req.params;
     const { name, age, talk } = req.body;
     const { rate, watchedAt } = talk;
@@ -86,14 +87,6 @@ routes.put('/talker/:id',
       { name, age, id: Number(id), talk: { watchedAt, rate } }];
     await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
     res.status(200).json({ name, age, id: Number(id), talk: { watchedAt, rate } });
-});
-
-routes.delete('/talker/:id', async (req, res) => {
-  const { id } = req.params;
-  const talkers = await readTalker();
-  const newTalkers = talkers.filter((p) => p.id !== Number(id));
-  await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
-  res.status(204).end();
 });
 
 routes.use(middlewares.errorHandler);
