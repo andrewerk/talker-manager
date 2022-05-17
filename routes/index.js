@@ -56,9 +56,26 @@ routes.post('/talker',
     const talkers = await readTalker();
     const id = talkers.length + 1;
     const newTalkers = [...talkers, { name, age, id, talk: { watchedAt, rate } }];
-    console.log(newTalkers);
     await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
     res.status(201).json({ name, age, id, talk: { watchedAt, rate } });
+});
+
+routes.put('/talker/:id',
+  middlewares.nameValidation,
+  middlewares.ageValidation,
+  middlewares.talkValidation,
+  middlewares.rateAndWatchedValidation,
+  async (req, res) => {
+    const { id } = req.params;
+    const { name, age, talk } = req.body;
+    const { rate, watchedAt } = talk;
+    const talkers = await readTalker();
+    const newTalkers = [
+      ...talkers.filter((p) => p.id !== Number(id)),
+      { name, age, id: Number(id), talk: { watchedAt, rate } }];
+    console.log(newTalkers);
+    await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
+    res.status(200).json({ name, age, id: Number(id), talk: { watchedAt, rate } });
 });
 
 routes.use(middlewares.errorHandler);

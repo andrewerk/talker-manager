@@ -1,6 +1,6 @@
 const talkValidation = (req, _res, next) => {
   const { talk } = req.body;
-  if (!talk || !talk.watchedAt || !talk.rate) {
+  if (!talk || !talk.watchedAt || talk.rate === undefined) {
     throw new Error(JSON.stringify({
       status: 400,
       message: 'O campo "talk" é obrigatório e "watchedAt" e "rate" não podem ser vazios',
@@ -12,7 +12,7 @@ const talkValidation = (req, _res, next) => {
 const rateAndWatchedValidation = (req, _res, next) => {
   const { talk } = req.body;
   const { watchedAt, rate } = talk;
-  if (rate < 1 || rate > 5) {
+  if (rate < 1 || rate > 5 || rate === 0) {
     throw new Error(JSON.stringify({
       status: 400, message: 'O campo "rate" deve ser um inteiro de 1 à 5' }));
     }
