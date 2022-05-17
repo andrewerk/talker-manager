@@ -78,6 +78,14 @@ routes.put('/talker/:id',
     res.status(200).json({ name, age, id: Number(id), talk: { watchedAt, rate } });
 });
 
+routes.delete('/talker/:id', async (req, res) => {
+  const { id } = req.params;
+  const talkers = await readTalker();
+  const newTalkers = talkers.filter((p) => p.id !== Number(id));
+  await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
+  res.status(204).end();
+});
+
 routes.use(middlewares.errorHandler);
 
 module.exports = routes;
