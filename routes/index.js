@@ -24,6 +24,17 @@ function generateToken() {
   return crypto.randomBytes(8).toString('hex');
 }
 
+routes.get('/talker/search', middlewares.autho, async (req, res) => {
+  const { q } = req.query;
+  console.log(q);
+  const talkers = await readTalker();
+  if (q === undefined) return res.status(200).json(talkers);
+  const filteredTalkers = talkers.filter((p) => (
+    p.name.toLowerCase().includes(q.toLocaleLowerCase())));
+  if (filteredTalkers.length > 0) return res.status(200).json(filteredTalkers);
+  return res.status(200).json([]);
+});
+
 routes.get('/talker', async (_req, res) => {
   const talkers = await readTalker();
   res.status(200).json(talkers);
@@ -73,7 +84,6 @@ routes.put('/talker/:id',
     const newTalkers = [
       ...talkers.filter((p) => p.id !== Number(id)),
       { name, age, id: Number(id), talk: { watchedAt, rate } }];
-    console.log(newTalkers);
     await fs.writeFile('talker.json', JSON.stringify(newTalkers, null, 2));
     res.status(200).json({ name, age, id: Number(id), talk: { watchedAt, rate } });
 });
